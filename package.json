@@ -1,0 +1,27 @@
+{
+  "name": "kittentts-cli",
+  "version": "1.0.0",
+  "description": "Command-line interface for KittenTTS - acts as a 'say' command replacement",
+  "bin": {
+    "kittentts-cli": "./npx-install.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adhipk/kittentts-cli.git"
+  },
+  "keywords": [
+    "tts",
+    "text-to-speech",
+    "kittentts",
+    "speech-synthesis",
+    "voice",
+    "audio",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/adhipk/kittentts-cli/issues"
+  },
+  "homepage": "https://github.com/adhipk/kittentts-cli#readme"
+}

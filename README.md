@@ -4,9 +4,38 @@ A command-line interface for KittenTTS that acts as a replacement for the macOS 
 
 ## Installation
 
-KittenTTS has been installed in `~/.kittentts/` with a virtual environment managed by `uv`.
+### Quick Install (npx)
 
-The `kit` command is available at `~/.local/bin/kit` (symlinked to `~/.kittentts/kit`).
+```bash
+npx kittentts-cli
+```
+
+### Manual Install
+
+```bash
+git clone https://github.com/adhipk/kittentts-cli.git
+cd kittentts-cli
+./install.sh
+```
+
+### Requirements
+
+- Python 3.12
+- [uv](https://docs.astral.sh/uv/) package manager
+
+```bash
+# Install uv
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Install Python 3.12 (macOS)
+brew install python@3.12
+```
+
+The `kit` command will be installed to `~/.local/bin/kit`. Make sure this directory is in your PATH:
+
+```bash
+export PATH="$HOME/.local/bin:$PATH"
+```
 
 ## Usage
 
