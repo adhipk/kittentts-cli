@@ -10,6 +10,8 @@ A command-line interface for KittenTTS that acts as a replacement for the macOS 
 npx kittentts-cli
 ```
 
+This will install both the `kit` command and the Claude Code skill (if Claude Code is installed).
+
 ### Manual Install
 
 ```bash
@@ -17,6 +19,8 @@ git clone https://github.com/adhipk/kittentts-cli.git
 cd kittentts-cli
 ./install.sh
 ```
+
+Both methods will automatically install the Claude Code skill to `~/.claude/skills/tts.md` if Claude Code is detected.
 
 ### Requirements
 
@@ -96,6 +100,27 @@ kit -v Bruno -s 1.1 "Bruno speaking a bit faster"
 | Choose voice | `say -v Alex "hello"` | `kit -v Luna "hello"` |
 | Speech rate | `say -r 200 "hello"` | `kit -s 1.2 "hello"` |
 | Save to file | `say -o out.aiff "hello"` | `kit -o out.wav "hello"` |
+
+## Claude Code Integration
+
+If you have [Claude Code](https://claude.ai/code) installed, the installation automatically adds a skill that teaches Claude how to use the `kit` command for text-to-speech tasks.
+
+After installation, you can ask Claude Code to:
+- "Read this text aloud"
+- "Speak this in Luna's voice"
+- "Convert this to audio"
+- "What voices are available?"
+
+Claude will automatically use the `kit` command to fulfill these requests.
+
+### Manual Skill Installation
+
+If Claude Code wasn't detected during installation, manually copy the skill:
+
+```bash
+mkdir -p ~/.claude/skills
+cp tts.skill.md ~/.claude/skills/tts.md
+```
 
 ## Notes
 

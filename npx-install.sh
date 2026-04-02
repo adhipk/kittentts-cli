@@ -58,6 +58,18 @@ uv pip install https://github.com/KittenML/KittenTTS/releases/download/0.8.1/kit
 echo "Creating command link..."
 ln -sf "$INSTALL_DIR/kit" "$BIN_DIR/kit"
 
+# Install Claude Code skill
+SKILL_DIR="$HOME/.claude/skills"
+if [ -d "$HOME/.claude" ]; then
+    echo "Installing Claude Code skill..."
+    mkdir -p "$SKILL_DIR"
+    cp "$SCRIPT_DIR/tts.skill.md" "$SKILL_DIR/tts.md"
+    echo "✅ Claude Code skill installed to $SKILL_DIR/tts.md"
+else
+    echo "⚠️  Claude Code not found - skill not installed"
+    echo "   Install skill manually: cp tts.skill.md ~/.claude/skills/tts.md"
+fi
+
 echo ""
 echo "✅ Installation complete!"
 echo ""
