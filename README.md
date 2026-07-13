@@ -1,18 +1,21 @@
-# KittenTTS Command - `kit`
+# KittenTTS CLI
 
-A command-line interface for KittenTTS that acts as a replacement for the macOS `say` command.
+`kit` is a `say`-like text-to-speech command powered by KittenTTS. It accepts
+arguments or stdin, strips Markdown for natural speech, streams long text in
+chunks, writes WAV files, and can lazily use Chatterbox for voice cloning.
+`kit-watch` watches a text file and reads the full file or only appended text.
 
-## Installation
+## Requirements
 
-### Quick Install (npx)
+- macOS for direct playback through `afplay` (WAV output works elsewhere)
+- [`uv`](https://docs.astral.sh/uv/)
+- `fswatch` for the optional `kit-watch` command
 
-```bash
-npx kittentts-cli
-```
+Python and KittenTTS are declared in the `kit` script using PEP 723 metadata;
+`uv` creates and caches the environment on first use. No project virtualenv is
+required.
 
-This will install both the `kit` command and the Claude Code skill (if Claude Code is installed).
-
-### Manual Install
+## Install
 
 ```bash
 git clone https://github.com/adhipk/kittentts-cli.git
@@ -20,114 +23,69 @@ cd kittentts-cli
 ./install.sh
 ```
 
-Both methods will automatically install the Claude Code skill to `~/.claude/skills/tts.md` if Claude Code is detected.
+The installer places managed files in `~/.local/share/kittentts-cli` and links
+`kit` and `kit-watch` into `~/.local/bin`. Override `INSTALL_DIR` or `BIN_DIR`
+with absolute paths when needed. If Claude Code is present, its TTS skill is installed as well;
+set `INSTALL_CLAUDE_SKILL=0` to skip it.
 
-### Requirements
+Verified v1.0 installs under `~/.kittentts` are migrated automatically. The
+legacy checkout is retained for manual review so local changes or its old
+virtual environment are never discarded by an upgrade.
 
-- Python 3.12
-- [uv](https://docs.astral.sh/uv/) package manager
-
-```bash
-# Install uv
-curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# Install Python 3.12 (macOS)
-brew install python@3.12
-```
-
-The `kit` command will be installed to `~/.local/bin/kit`. Make sure this directory is in your PATH:
+To remove only files owned by this project:
 
 ```bash
-export PATH="$HOME/.local/bin:$PATH"
+./uninstall.sh
 ```
+
+An npm-compatible installer remains available with `npx kittentts-cli`.
 
 ## Usage
 
-### Basic usage
 ```bash
-kit "Hello, world!"
-```
-
-### List available voices
-```bash
+kit "Hello, world"
+printf '# A **Markdown** note\n' | kit
+kit --voice Luna --speed 1.1 "A different voice"
+kit --output speech.wav "Save instead of playing"
 kit --list-voices
 ```
 
-Available voices: Bella, Jasper, Luna, Bruno, Rosie, Hugo, Kiki, Leo
+Long input streams automatically. Tune its behavior with
+`--stream-threshold` and `--chunk-size`, or preserve Markdown punctuation with
+`--no-strip-markdown`.
 
-### Use a specific voice
-```bash
-kit -v Luna "This is Luna speaking"
-```
-
-### Adjust speech speed
-```bash
-kit -s 1.2 "Speaking faster"
-kit -s 0.8 "Speaking slower"
-```
-
-### Save to file instead of playing
-```bash
-kit -o output.wav "Save this to a file"
-```
-
-### Read from stdin
-```bash
-echo "Hello from stdin" | kit
-cat file.txt | kit
-```
-
-### Combine options
-```bash
-kit -v Bruno -s 1.1 "Bruno speaking a bit faster"
-```
-
-## Options
-
-- `-v, --voice VOICE` - Voice to use (default: Jasper)
-- `-s, --speed SPEED` - Speech speed multiplier (default: 1.0)
-- `-o, --output FILE` - Save audio to file instead of playing
-- `-l, --list-voices` - List all available voices
-- `-m, --model MODEL` - Specify model (default: KittenML/kitten-tts-mini-0.8)
-- `-h, --help` - Show help message
-
-## Comparison with macOS `say`
-
-| Feature | `say` | `kit` |
-|---------|-------|-------|
-| Basic TTS | `say "hello"` | `kit "hello"` |
-| List voices | `say -v ?` | `kit --list-voices` |
-| Choose voice | `say -v Alex "hello"` | `kit -v Luna "hello"` |
-| Speech rate | `say -r 200 "hello"` | `kit -s 1.2 "hello"` |
-| Save to file | `say -o out.aiff "hello"` | `kit -o out.wav "hello"` |
-
-## Claude Code Integration
-
-If you have [Claude Code](https://claude.ai/code) installed, the installation automatically adds a skill that teaches Claude how to use the `kit` command for text-to-speech tasks.
-
-After installation, you can ask Claude Code to:
-- "Read this text aloud"
-- "Speak this in Luna's voice"
-- "Convert this to audio"
-- "What voices are available?"
-
-Claude will automatically use the `kit` command to fulfill these requests.
-
-### Manual Skill Installation
-
-If Claude Code wasn't detected during installation, manually copy the skill:
+Chatterbox is an optional lazy backend:
 
 ```bash
-mkdir -p ~/.claude/skills
-cp tts.skill.md ~/.claude/skills/tts.md
+kit --backend chatterbox --voice-ref voice.wav "Clone this voice"
 ```
 
-## Notes
+It resolves `chatterbox-tts` only when selected. Use
+`--chatterbox-device`, `--chatterbox-python`, or `--chatterbox-package` to
+override its runtime.
 
-- First run will download the model (~22MB) from HuggingFace
-- Audio is played using `afplay` on macOS
-- Output format is WAV at 24kHz sample rate
-- To get faster downloads and avoid warnings, set your HuggingFace token:
-  ```bash
-  export HF_TOKEN="your_token_here"
-  ```
+Watch a file:
+
+```bash
+kit-watch notes.md
+kit-watch --tail notes.md
+kit-watch notes.md -- --voice Luna --speed 1.1
+```
+
+`--tail` speaks only appended bytes after the initial read. Use
+`--no-initial` to start at the current end of the file and `--debounce` to tune
+the change delay.
+
+## Development
+
+The test suite exercises text processing, watcher delegation, reversible
+install/uninstall behavior, and streaming failure cleanup without loading a
+model or using the network:
+
+```bash
+npm test
+```
+
+The first real KittenTTS run downloads its Python packages and model data.
+Set `HF_TOKEN` when needed; once the required model files are cached, `kit`
+uses Hugging Face offline mode unless `--refresh-model` is passed.

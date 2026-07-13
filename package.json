@@ -1,9 +1,22 @@
 {
   "name": "kittentts-cli",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Command-line interface for KittenTTS - acts as a 'say' command replacement",
   "bin": {
     "kittentts-cli": "./npx-install.sh"
+  },
+  "files": [
+    "kit",
+    "kit-watch",
+    "install.sh",
+    "uninstall.sh",
+    "npx-install.sh",
+    "tts.skill.md",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "bash tests/test.sh && python3 tests/test_stream.py"
   },
   "repository": {
     "type": "git",
